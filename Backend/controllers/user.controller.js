@@ -2,6 +2,8 @@ const userModel = require("../models/user.model");
 const userService = require("../services/user.services");
 const { validationResult } = require("express-validator");
 
+
+
 module.exports.registerUser = async (req, res, next) => {
     try {
         // Validate the request body using express-validator
@@ -28,16 +30,24 @@ module.exports.registerUser = async (req, res, next) => {
             firstName,
             lastName,
             email,
-            password: hashedPassword
+            password: hashedPassword,
         });
 
-        const token = await userService.generateAuthToken(user);
+        const token = user.generateAuthToken(); // Generate token using the instance method
+
+        if (!token) {
+            return res.status(500).json({
+                message: "Token not generated",
+            });
+        }
 
         res.status(201).json({ token, user });
     } catch (error) {
         next(error);
     }
 };
+
+
 
 module.exports.loginUser = async (req, res, next) => {
     try {
@@ -54,18 +64,24 @@ module.exports.loginUser = async (req, res, next) => {
         const user = await userModel.findOne({ email }).select("+password");
         if (!user) {
             return res.status(401).json({
-                message: "Invalid email or password"
+                message: "Invalid email or password",
             });
         }
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(401).json({
-                message: "Invalid email or password"
+                message: "Invalid email or password",
             });
         }
 
-        const token = await userService.generateAuthToken(user);
+        const token = user.generateAuthToken();
+      
+        if (!token) {
+            return res.status(500).json({
+                message: "Token not generated",
+            });
+        }
 
         res.status(200).json({ token, user });
     } catch (error) {
@@ -73,9 +89,10 @@ module.exports.loginUser = async (req, res, next) => {
     }
 };
 
+
 module.exports.getUserProfile = async (req, res, next) => {
     try {
-        res.status(200).json(req.user);
+        res.status(200).json(req.user); // User is set in the middleware
     } catch (error) {
         next(error);
     }

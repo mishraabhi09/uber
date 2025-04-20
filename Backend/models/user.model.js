@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        Select: false
+        select: false
 
     },
 
@@ -55,11 +55,11 @@ userSchema.statics.hashPassword = async function (password) {
     return await bcrypt.hash(password, 10);
 }
 
-const userModel = mongoose.model("users", userSchema);
+const userModel = mongoose.model("user", userSchema);
 
-// module.exports = userModel;
+module.exports = userModel;
 
-module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+// module.exports = mongoose.models.User || mongoose.model('User', userSchema);
 
 
 
