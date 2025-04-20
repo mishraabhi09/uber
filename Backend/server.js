@@ -5,11 +5,15 @@ const http = require('http');
 const app = require('./app');
 const connectToDB = require('./db/db');
 
+const cookieParser = require("cookie-parser");
+
 
 connectToDB();
 const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
+
+app.use(cookieParser());
 
 server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
