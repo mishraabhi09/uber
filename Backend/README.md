@@ -325,3 +325,135 @@ This endpoint is used to log out the currently authenticated user by invalidatin
 
 - The token is cleared from cookies and added to the blacklist to prevent reuse.
 - Ensure the `Authorization` header contains a valid token.
+
+---
+
+## Endpoint: `/captain/register`
+
+### Description:
+
+This endpoint is used to register a new captain in the system.
+
+### HTTP Method:
+
+`POST`
+
+### Request Body:
+
+The request body must be in JSON format and include the following fields:
+
+- `fullname` (object):
+  - `firstName` (string, required): Must be at least 5 characters long.
+  - `lastName` (string, required): Must be at least 5 characters long.
+- `email` (string, required): Must be a valid email address.
+- `password` (string, required): Must be at least 5 characters long.
+- `vehicle` (object):
+  - `color` (string, required): Must be at least 3 characters long.
+  - `plate` (string, required): Must be at least 5 characters long.
+  - `capacity` (integer, required): Must be at least 1.
+  - `vehicleType` (string, required): Must be one of `car`, `auto`, or `bike`.
+
+#### Example Request Body:
+
+```json
+{
+  "fullname": {
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "email": "johndoe@example.com",
+  "password": "securepassword",
+  "vehicle": {
+    "color": "Red",
+    "plate": "ABC123",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+### Response:
+
+#### Success Response:
+
+- **Status Code:** `201 Created`
+- **Body:**
+  ```json
+  {
+    "token": "jwt_token_here",
+    "captain": {
+      "_id": "captain_id_here",
+      "fullname": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "email": "johndoe@example.com",
+      "vehicle": {
+        "color": "Red",
+        "plate": "ABC123",
+        "capacity": 4,
+        "vehicleType": "car"
+      },
+      "socketId": null,
+      "Status": "inactive"
+    }
+  }
+  ```
+
+#### Error Responses:
+
+1. **Validation Errors:**
+
+   - **Status Code:** `400 Bad Request`
+   - **Body:**
+     ```json
+     {
+       "errors": [
+         {
+           "msg": "First name must be at least 5 characters long",
+           "param": "fullname.firstName",
+           "location": "body"
+         },
+         {
+           "msg": "Invalid email , ensure it is at least 5 characters long",
+           "param": "email",
+           "location": "body"
+         }
+       ]
+     }
+     ```
+
+2. **Captain Already Exists:**
+
+   - **Status Code:** `400 Bad Request`
+   - **Body:**
+     ```json
+     {
+       "message": "Captain already exists"
+     }
+     ```
+
+3. **Password Hashing Error:**
+
+   - **Status Code:** `500 Internal Server Error`
+   - **Body:**
+     ```json
+     {
+       "message": "Error hashing password"
+     }
+     ```
+
+4. **Other Errors:**
+   - **Status Code:** `500 Internal Server Error`
+   - **Body:**
+     ```json
+     {
+       "message": "Error message here"
+     }
+     ```
+
+### Notes:
+
+- Ensure that all required fields are provided in the request body.
+- The `password` field is hashed before being stored in the database.
+- A JWT token is generated upon successful registration.
