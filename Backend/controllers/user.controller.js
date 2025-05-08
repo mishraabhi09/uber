@@ -1,8 +1,7 @@
 const userModel = require("../models/user.model");
 const userService = require("../services/user.services");
 const { validationResult } = require("express-validator");
-
-
+const blacklistTokenModel = require("../models/blacklistToken.model");
 
 module.exports.registerUser = async (req, res, next) => {
     try {
@@ -47,8 +46,6 @@ module.exports.registerUser = async (req, res, next) => {
     }
 };
 
-
-
 module.exports.loginUser = async (req, res, next) => {
     try {
         const errors = validationResult(req);
@@ -76,12 +73,14 @@ module.exports.loginUser = async (req, res, next) => {
         }
 
         const token = user.generateAuthToken();
-      
+
         if (!token) {
             return res.status(500).json({
                 message: "Token not generated",
             });
         }
+
+        res.cookie("token", token);
 
         res.status(200).json({ token, user });
     } catch (error) {
@@ -89,12 +88,42 @@ module.exports.loginUser = async (req, res, next) => {
     }
 };
 
-
 module.exports.getUserProfile = async (req, res, next) => {
     try {
         res.status(200).json(req.user); // User is set in the middleware
     } catch (error) {
         next(error);
+    }
+};
+
+module.exports.logoutUser = async (req, res, next) => {
+    try {
+        // Clear the token from cookies
+        res.clearCookie("token");
+
+        // Extract the token from cookies or Authorization header
+        const token =
+            req.cookies?.token ||
+            (req.headers.authorization?.startsWith("Bearer ") &&
+                req.headers.authorization.split(" ")[1]);
+
+        if (!token) {
+            return res.status(401).json({
+                message: "Token not found",
+            });
+        }
+
+        // Add the token to the blacklist
+        await blacklistTokenModel.create({ token });
+
+        res.status(200).json({
+            message: "User logged out successfully",
+        });
+    } catch (error) {
+        console.error("Error in logoutUser:", error);
+        res.status(500).json({
+            message: "Internal Server Error",
+        });
     }
 };
 
