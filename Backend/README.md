@@ -328,6 +328,10 @@ This endpoint is used to log out the currently authenticated user by invalidatin
 
 ---
 
+## Captain Endpoints 
+
+---
+
 ## Endpoint: `/captains/register`
 
 ### Description:
@@ -460,9 +464,6 @@ The request body must be in JSON format and include the following fields:
 
 ---
 
-## Captain Endpoints
-
----
 
 ### Endpoint: `/captains/login`
 
