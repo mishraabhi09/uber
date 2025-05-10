@@ -328,7 +328,7 @@ This endpoint is used to log out the currently authenticated user by invalidatin
 
 ---
 
-## Endpoint: `/captain/register`
+## Endpoint: `/captains/register`
 
 ### Description:
 
@@ -457,3 +457,182 @@ The request body must be in JSON format and include the following fields:
 - Ensure that all required fields are provided in the request body.
 - The `password` field is hashed before being stored in the database.
 - A JWT token is generated upon successful registration.
+
+---
+
+## Captain Endpoints
+
+---
+
+### Endpoint: `/captains/login`
+
+**Description:**  
+Authenticate a captain and return a JWT token upon successful login.
+
+**HTTP Method:**  
+`POST`
+
+**Request Body:**
+```json
+{
+  "email": "captain@example.com",
+  "password": "securepassword"
+}
+```
+
+**Responses:**
+
+- **200 OK**
+  ```json
+  {
+    "token": "jwt_token_here",
+    "captain": {
+      "_id": "captain_id_here",
+      "fullname": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "email": "captain@example.com",
+      "vehicle": {
+        "color": "Red",
+        "plate": "ABC123",
+        "capacity": 4,
+        "vehicleType": "car"
+      },
+      "socketId": null,
+      "Status": "inactive"
+    }
+  }
+  ```
+
+- **400 Bad Request** (Validation or invalid credentials)
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Invalid email",
+        "param": "email",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+  or
+  ```json
+  {
+    "message": "Invalid email or password"
+  }
+  ```
+
+- **500 Internal Server Error**
+  ```json
+  {
+    "message": "Error message here"
+  }
+  ```
+
+---
+
+### Endpoint: `/captains/profile`
+
+**Description:**  
+Fetch the profile of the currently authenticated captain.
+
+**HTTP Method:**  
+`GET`
+
+**Headers:**
+- `Authorization`: `Bearer <token>` (Required)
+
+**Responses:**
+
+- **200 OK**
+  ```json
+  {
+    "captain": {
+      "_id": "captain_id_here",
+      "fullname": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "email": "captain@example.com",
+      "vehicle": {
+        "color": "Red",
+        "plate": "ABC123",
+        "capacity": 4,
+        "vehicleType": "car"
+      },
+      "socketId": null,
+      "Status": "inactive"
+    }
+  }
+  ```
+
+- **401 Unauthorized**
+  ```json
+  {
+    "message": "Unauthorized, token not found"
+  }
+  ```
+  or
+  ```json
+  {
+    "message": "Unthorized, token blacklisted"
+  }
+  ```
+  or
+  ```json
+  {
+    "message": "Unauthorized, invalid token"
+  }
+  ```
+
+---
+
+### Endpoint: `/captains/logout`
+
+**Description:**  
+Logs out the currently authenticated captain by invalidating their token.
+
+**HTTP Method:**  
+`GET`
+
+**Headers:**
+- `Authorization`: `Bearer <token>` (Required)
+
+**Responses:**
+
+- **200 OK**
+  ```json
+  {
+    "message": "Captain logged out successfully"
+  }
+  ```
+
+- **401 Unauthorized**
+  ```json
+  {
+    "message": "Token not found"
+  }
+  ```
+  or
+  ```json
+  {
+    "message": "Unthorized, token blacklisted"
+  }
+  ```
+  or
+  ```json
+  {
+    "message": "Unauthorized, invalid token"
+  }
+  ```
+
+- **500 Internal Server Error**
+  ```json
+  {
+    "message": "Internal Server Error"
+  }
+  ```
+
+---
