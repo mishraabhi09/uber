@@ -114,7 +114,7 @@ const CaptainSignUp = () => {
                     <button
 
                         className="border mt-7 ml-6 py-2 w-80 placeholder:text-base px-2 bg-[#111] text-white rounded-lg ">
-                        Login
+                        Create account
 
                     </button>
 
