@@ -1,6 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { CaptainDataContext } from "../context/CaptainContext";
+import axios from "axios";
 
 const CaptainSignUp = () => {
 
@@ -8,31 +9,63 @@ const CaptainSignUp = () => {
     const [password, setPassword] = useState("");
     const [firstname, setFirstName] = useState("");
     const [lastname, setLastName] = useState("");
-    const [captaindata, setCaptainData] = useState({});
 
-    const submitHandler = (e) => {
+
+
+    // Vehicle Specifications---
+    const [vehicleColor, setVehicleColor] = useState();
+    const [vehicleCapacity, setVehicleCapacity] = useState();
+    const [vehiclePlate, setVehiclePlate] = useState();
+    const [vehicleType, setVehicleType] = useState();
+
+
+    const navigate = useNavigate();
+    const [captain, setCaptain] = useContext(CaptainDataContext);
+
+
+    const submitHandler = async (e) => {
         e.preventDefault();
 
-        setCaptainData({
-
-            username: {
-                firstname: firstname,
-                lastname: lastname
-
-            }
-            ,
+        const Captaindata = {
+            fullname: {
+                firstName: firstname,
+                lastName: lastname
+            },
             email: email,
-            password: password
-        })
+            password: password,
+            vehicle: {
+                color: vehicleColor,
+                plate: vehiclePlate,
+                capacity: vehicleCapacity,
+                vehicleType: vehicleType
+            }
+        };
 
-        console.log(captaindata);
+        const baseURL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
 
-        setEmail("");
-        setPassword("");
-        setFirstName("");
-        setLastName("");
+        try {
+            const response = await axios.post(`${baseURL}/captains/register`, Captaindata);
 
-    }
+            if (response.status === 200 || response.status === 201) {
+                const data = response.data;
+                setCaptain(data.captain);
+                localStorage.setItem("token", data.token);
+                navigate("/captainhome");
+            }
+            console.log(Captaindata);
+
+            setEmail("");
+            setPassword("");
+            setFirstName("");
+            setLastName("");
+            setVehicleCapacity("");
+            setVehicleColor("");
+            setVehicleType("");
+            setVehiclePlate("");
+        } catch (error) {
+            console.error("Registration failed:", error);
+        }
+    };
 
 
 
@@ -51,7 +84,6 @@ const CaptainSignUp = () => {
                     <p className="text-xl ml-6">What's Our captain name</p>
 
                     <input
-
                         required
                         className="border mt-3 ml-6 py-2 w-80 placeholder:text-base px-2 bg-[#eeeeee] rounded-xl"
                         type="text"
@@ -99,7 +131,6 @@ const CaptainSignUp = () => {
                     <p className="text-xl ml-6 mt-5">What's your password</p>
 
                     <input
-
                         required
                         value={password}
                         onChange={(e) => {
@@ -111,10 +142,50 @@ const CaptainSignUp = () => {
 
                     />
 
+                    <p className="text-xl ml-6 mt-5">Vehicle Information</p>
+
+                    <input
+                        required
+                        className="border mt-3 ml-6 py-2 w-80 placeholder:text-base px-2 bg-[#eeeeee] rounded-xl"
+                        type="text"
+                        placeholder="Vehicle Color"
+                        value={vehicleColor || ""}
+                        onChange={(e) => setVehicleColor(e.target.value)}
+                    />
+
+                    <input
+                        required
+                        className="border mt-3 ml-6 py-2 w-80 placeholder:text-base px-2 bg-[#eeeeee] rounded-xl"
+                        type="text"
+                        placeholder="Vehicle Plate"
+                        value={vehiclePlate || ""}
+                        onChange={(e) => setVehiclePlate(e.target.value)}
+                    />
+
+                    <input
+                        required
+                        className="border mt-3 ml-6 py-2 w-80 placeholder:text-base px-2 bg-[#eeeeee] rounded-xl"
+                        type="number"
+                        min="1"
+                        placeholder="Vehicle Capacity"
+                        value={vehicleCapacity || ""}
+                        onChange={(e) => setVehicleCapacity(e.target.value)}
+                    />
+
+                    <input
+                        required
+                        className="border mt-3 ml-6 py-2 w-80 placeholder:text-base px-2 bg-[#eeeeee] rounded-xl"
+                        type="text"
+                        placeholder="Vehicle Type"
+                        value={vehicleType || ""}
+                        onChange={(e) => setVehicleType(e.target.value)}
+                    />
+
+
                     <button
 
                         className="border mt-7 ml-6 py-2 w-80 placeholder:text-base px-2 bg-[#111] text-white rounded-lg ">
-                        Create account
+                        Create Captain account
 
                     </button>
 
